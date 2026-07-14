@@ -1,5 +1,9 @@
+// =========================
+// Required Modules
+// =========================
 const fs = require('fs');
 const path = require('path');
+const http = require('http'); // <-- PORT workaround for Render
 const {
     Client,
     Collection,
@@ -13,7 +17,9 @@ require('dotenv').config();
 
 console.log("Loaded Discord.js version:", require('discord.js').version);
 
+// =========================
 // Discord Client
+// =========================
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -22,12 +28,16 @@ const client = new Client({
     ]
 });
 
+// =========================
 // MongoDB Connection
+// =========================
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('📦 Connected to MongoDB'))
     .catch(err => console.error(err));
 
-// Command Collection
+// =========================
+// Command Loader
+// =========================
 client.commands = new Collection();
 const commands = [];
 
@@ -46,7 +56,9 @@ for (const file of commandFiles) {
     }
 }
 
-// Register Slash Commands
+// =========================
+// Slash Command Registration
+// =========================
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 (async () => {
@@ -67,9 +79,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     }
 })();
 
+// =========================
 // Interaction Handler
+// =========================
 client.on('interactionCreate', async interaction => {
-
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
@@ -97,8 +110,10 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Bot Ready
-client.once('clientReady', () => {
+// =========================
+// Bot Ready Event
+// =========================
+client.once('ready', () => {
     console.log(`🤖 Bot successfully logged in as ${client.user.tag}`);
 
     const statuses = [
@@ -115,9 +130,26 @@ client.once('clientReady', () => {
             activities: [statuses[currentStatus]],
             status: 'online'
         });
-
     };
+
+    updateStatus();
 });
 
+// =========================
+// Render PORT Workaround
+// =========================
+// This prevents Render from failing if you use a Web Service.
+// If you switch to a Worker, you can delete this section.
+const PORT = process.env.PORT || 3000;
+
+http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end("Bot is running");
+}).listen(PORT, () => {
+    console.log(`🌐 Render PORT active on ${PORT}`);
+});
+
+// =========================
 // Login
+// =========================
 client.login(process.env.TOKEN);
