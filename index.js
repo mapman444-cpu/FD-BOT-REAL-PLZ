@@ -3,7 +3,7 @@
 // =========================
 const fs = require('fs');
 const path = require('path');
-const http = require('http'); // <-- PORT workaround for Render
+const http = require('http'); // Render free-tier keep-alive
 const {
     Client,
     Collection,
@@ -27,6 +27,32 @@ const client = new Client({
         GatewayIntentBits.GuildMessages
     ]
 });
+
+// =========================
+// Auto-Reconnect Handlers
+// =========================
+client.on('error', (err) => {
+    console.error('Discord client error:', err);
+});
+
+client.on('shardError', (err) => {
+    console.error('Shard error:', err);
+});
+
+client.on('disconnect', () => {
+    console.warn('Bot disconnected. Attempting to reconnect...');
+});
+
+client.on('reconnecting', () => {
+    console.log('Bot reconnecting...');
+});
+
+// =========================
+// Heartbeat (keeps bot alive longer)
+// =========================
+setInterval(() => {
+    console.log("Heartbeat: Bot is alive");
+}, 5 * 60 * 1000); // every 5 minutes
 
 // =========================
 // MongoDB Connection
@@ -128,7 +154,7 @@ client.once('ready', () => {
     const updateStatus = () => {
         client.user.setPresence({
             activities: [statuses[currentStatus]],
-            status: 'online'
+            status: 'idle'
         });
     };
 
@@ -136,10 +162,8 @@ client.once('ready', () => {
 });
 
 // =========================
-// Render PORT Workaround
+// Render Keep-Alive Server (free tier)
 // =========================
-// This prevents Render from failing if you use a Web Service.
-// If you switch to a Worker, you can delete this section.
 const PORT = process.env.PORT || 3000;
 
 http.createServer((req, res) => {
