@@ -34,7 +34,7 @@ module.exports = {
                 .setRequired(true))
         .addRoleOption(option =>
             option.setName('punishment')
-                .setDescription('Select the punishment role')
+                .setDescription('Select the punishment')
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('reason')

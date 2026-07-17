@@ -37,9 +37,17 @@ module.exports = {
                 .setDescription('Rank they are being demoted from')
                 .setRequired(true))
         .addRoleOption(option =>
+            option.setName('old_callsign')
+                .setDescription('Old callsign for the firefighter')
+                .setRequired(true))
+        .addRoleOption(option =>
             option.setName('new_rank')
                 .setDescription('Rank they are being demoted to')
                 .setRequired(true))
+        .addRoleOption(option =>
+            option.setName('new_callsign')
+                .setDescription('New callsign for the firefighter (if applicable)')
+                .setRequired(false))
         .addStringOption(option =>
             option.setName('reason')
                 .setDescription('Reason for the demotion')
@@ -97,11 +105,14 @@ module.exports = {
         // Build embed
         const embed = new EmbedBuilder()
             .setTitle(`${config.CGFD_LOGO} Casa Grande Fire Department Demotion`)
+            .setColor('#FF0000')
             .setThumbnail(targetUser.displayAvatarURL({ size: 1024 }))
             .addFields(
                 { name: 'Firefighter', value: `${targetUser}` },
                 { name: 'Old Rank', value: `<@&${oldRank.id}>` },
+                { name: 'Old Callsign', value: interaction.options.getString('old_callsign') || 'Not specified' },
                 { name: 'New Rank', value: `<@&${newRank.id}>` },
+                { name: 'New Callsign', value: interaction.options.getString('new_callsign') || 'Not specified' },
                 { name: 'Reason', value: reason },
                 { name: 'Notes', value: notes },
                 { name: 'Case ID', value: caseId }
@@ -109,7 +120,7 @@ module.exports = {
             .setFooter({ text: `Date: ${formattedDate}` });
 
         // Edit the deferred reply
-        await interaction.editReply('Successfully demoted firefighter.');
+        await interaction.editReply('Success.');
 
         // Log channel
         const logChannel = interaction.guild.channels.cache.get(config.demotionLogChannel);
