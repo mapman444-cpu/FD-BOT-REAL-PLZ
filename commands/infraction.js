@@ -33,6 +33,10 @@ module.exports = {
                 .setDescription('Firefighter receiving the infraction')
                 .setRequired(true))
         .addRoleOption(option =>
+            option.setName('employee_callsign')
+                .setDescription('Select the firefighters callsign')
+                .setRequired(true))
+        .addRoleOption(option =>
             option.setName('punishment')
                 .setDescription('Select the punishment')
                 .setRequired(true))
@@ -87,6 +91,7 @@ module.exports = {
             .setThumbnail(targetUser.displayAvatarURL({ size: 1024 }))
             .addFields(
                 { name: 'Firefighter', value: `${targetUser}` },
+                { name: 'Employee Callsign', value: `<@&${interaction.options.getRole('employee_callsign').id}>` },
                 { name: 'Punishment', value: `<@&${punishmentRole.id}>` },
                 { name: 'Reason', value: reason },
                 { name: 'Notes', value: notes },

@@ -44,7 +44,7 @@ module.exports = {
                 .addStringOption(option =>
             option.setName('new_callsign')
                 .setDescription('New callsign for the firefighter')
-                .setRequired(false)
+                .setRequired(true)
         )  
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
         .addRoleOption(option =>

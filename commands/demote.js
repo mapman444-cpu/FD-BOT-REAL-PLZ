@@ -28,40 +28,50 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('demotion')
         .setDescription('Demote a firefighter')
+
+        // REQUIRED OPTIONS FIRST
         .addUserOption(option =>
             option.setName('firefighter')
                 .setDescription('Firefighter being demoted')
-                .setRequired(true))
+                .setRequired(true)
+        )
         .addRoleOption(option =>
             option.setName('old_rank')
                 .setDescription('Rank they are being demoted from')
-                .setRequired(true))
-        .addRoleOption(option =>
+                .setRequired(true)
+        )
+        .addStringOption(option =>
             option.setName('old_callsign')
                 .setDescription('Old callsign for the firefighter')
-                .setRequired(true))
+                .setRequired(true)
+        )
         .addRoleOption(option =>
             option.setName('new_rank')
                 .setDescription('Rank they are being demoted to')
-                .setRequired(true))
-        .addRoleOption(option =>
-            option.setName('new_callsign')
-                .setDescription('New callsign for the firefighter (if applicable)')
-                .setRequired(false))
+                .setRequired(true)
+        )
         .addStringOption(option =>
             option.setName('reason')
                 .setDescription('Reason for the demotion')
-                .setRequired(true))
+                .setRequired(true)
+        )
+
+        // OPTIONAL OPTIONS LAST
+        .addStringOption(option =>
+            option.setName('new_callsign')
+                .setDescription('New callsign for the firefighter (if applicable)')
+                .setRequired(false)
+        )
         .addStringOption(option =>
             option.setName('notes')
                 .setDescription('Optional notes')
-                .setRequired(false))
+                .setRequired(false)
+        )
+
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
     async execute(interaction) {
-        if (!shouldProcessInteraction(interaction)) {
-            return;
-        }
+        if (!shouldProcessInteraction(interaction)) return;
 
         let webhookSent = false;
         await interaction.deferReply({ ephemeral: false });
@@ -82,15 +92,12 @@ module.exports = {
         await member.roles.remove(oldRank.id).catch(() => {});
 
         const rolesToRemove = member.roles.cache.filter(role => role.position > newRank.position);
-
         for (const role of rolesToRemove.values()) {
             await member.roles.remove(role.id).catch(() => {});
         }
 
-        // Add new rank
         await member.roles.add(newRank.id).catch(() => {});
 
-        // Log in database
         await Demotion.create({
             caseId,
             userId: targetUser.id,
@@ -102,7 +109,6 @@ module.exports = {
             date: new Date()
         });
 
-        // Build embed
         const embed = new EmbedBuilder()
             .setTitle(`${config.CGFD_LOGO} Casa Grande Fire Department Demotion`)
             .setColor('#FF0000')
@@ -119,30 +125,24 @@ module.exports = {
             )
             .setFooter({ text: `Date: ${formattedDate}` });
 
-        // Edit the deferred reply
         await interaction.editReply('Success.');
 
-        // Log channel
         const logChannel = interaction.guild.channels.cache.get(config.demotionLogChannel);
         if (logChannel) logChannel.send({ embeds: [embed] });
 
-        // DM user
-        await targetUser.send({ embeds: [embed] }).catch(() => {
-            console.log(`Could not DM ${targetUser.tag}. Their DMs may be closed.`);
-        });
+        await targetUser.send({ embeds: [embed] }).catch(() => {});
 
-        // Webhook
-       if (!webhookSent && process.env.DEMOTION_WEBHOOK_URL) {
-    webhookSent = true;
-    try {
-        await fetch(process.env.DEMOTION_WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ embeds: [embed.data] })
-        });
-    } catch (err) {
-        console.error("Demotion webhook failed:", err);
-    }
-}
+        if (!webhookSent && process.env.DEMOTION_WEBHOOK_URL) {
+            webhookSent = true;
+            try {
+                await fetch(process.env.DEMOTION_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ embeds: [embed.data] })
+                });
+            } catch (err) {
+                console.error("Demotion webhook failed:", err);
+            }
+        }
     }
 };
