@@ -86,8 +86,10 @@ mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000,
     heartbeatFrequencyMS: 10000
 })
-.then(() => console.log('📦 Connected to MongoDB'))
-.catch(err => console.error('MongoDB Error:', err));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('📦 Connected to MongoDB'))
+    .catch(err => console.error('MongoDB Error:', err));
+
 
 // =========================
 // Command Loader
