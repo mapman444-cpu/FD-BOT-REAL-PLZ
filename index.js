@@ -78,17 +78,12 @@ setInterval(() => {
 }, 5 * 60 * 1000); // every 5 minutes
 
 // =========================
-// MongoDB Connection (stable)
+// MongoDB Connection (Mongoose 8+)
 // =========================
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000,
-    heartbeatFrequencyMS: 10000
-})
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('📦 Connected to MongoDB'))
     .catch(err => console.error('MongoDB Error:', err));
+
 
 
 // =========================
