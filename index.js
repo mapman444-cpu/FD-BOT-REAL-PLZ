@@ -1,9 +1,6 @@
-// =========================
-// Required Modules
-// =========================
 const fs = require('fs');
 const path = require('path');
-const http = require('http'); // Render free-tier keep-alive
+const http = require('http'); 
 const {
     Client,
     Collection,
@@ -17,9 +14,7 @@ require('dotenv').config();
 
 console.log("Loaded Discord.js version:", require('discord.js').version);
 
-// =========================
-// Discord Client
-// =========================
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -28,9 +23,7 @@ const client = new Client({
     ]
 });
 
-// =========================
-// Global Crash Protection
-// =========================
+
 process.on('unhandledRejection', (reason) => {
     console.error('Unhandled Rejection:', reason);
 });
@@ -40,9 +33,7 @@ process.on('uncaughtException', (err) => {
 });
 
 
-// =========================
-// Global Crash Protection
-// =========================
+
 process.on('unhandledRejection', (reason) => {
     console.error('Unhandled Rejection:', reason);
 });
@@ -51,9 +42,7 @@ process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
 });
 
-// =========================
-// Auto-Reconnect Handlers
-// =========================
+
 client.on('error', (err) => {
     console.error('Discord client error:', err);
 });
@@ -70,25 +59,19 @@ client.on('reconnecting', () => {
     console.log('Bot reconnecting...');
 });
 
-// =========================
-// Heartbeat (keeps bot alive longer)
-// =========================
+
 setInterval(() => {
     console.log("Heartbeat: Bot is alive");
-}, 5 * 60 * 1000); // every 5 minutes
+}, 5 * 60 * 1000); 
 
-// =========================
-// MongoDB Connection (Mongoose 8+)
-// =========================
+
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('📦 Connected to MongoDB'))
     .catch(err => console.error('MongoDB Error:', err));
 
 
 
-// =========================
-// Command Loader
-// =========================
+
 client.commands = new Collection();
 const commands = [];
 
@@ -107,9 +90,7 @@ for (const file of commandFiles) {
     }
 }
 
-// =========================
-// Slash Command Registration
-// =========================
+
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 (async () => {
@@ -130,9 +111,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     }
 })();
 
-// =========================
-// Interaction Handler
-// =========================
+
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -161,9 +140,6 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// =========================
-// Bot Ready Event
-// =========================
 client.once('ready', () => {
     console.log(`🤖 Bot successfully logged in as ${client.user.tag}`);
 
@@ -186,9 +162,7 @@ client.once('ready', () => {
     updateStatus();
 });
 
-// =========================
-// Render Keep-Alive Server (free tier)
-// =========================
+
 const PORT = process.env.PORT || 3000;
 
 http.createServer((req, res) => {
@@ -198,7 +172,4 @@ http.createServer((req, res) => {
     console.log(`🌐 Render PORT active on ${PORT}`);
 });
 
-// =========================
-// Login
-// =========================
 client.login(process.env.TOKEN);
