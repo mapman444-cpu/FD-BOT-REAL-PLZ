@@ -29,6 +29,29 @@ const client = new Client({
 });
 
 // =========================
+// Global Crash Protection
+// =========================
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+
+// =========================
+// Global Crash Protection
+// =========================
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+// =========================
 // Auto-Reconnect Handlers
 // =========================
 client.on('error', (err) => {
@@ -55,11 +78,16 @@ setInterval(() => {
 }, 5 * 60 * 1000); // every 5 minutes
 
 // =========================
-// MongoDB Connection
+// MongoDB Connection (stable)
 // =========================
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('📦 Connected to MongoDB'))
-    .catch(err => console.error(err));
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    heartbeatFrequencyMS: 10000
+})
+.then(() => console.log('📦 Connected to MongoDB'))
+.catch(err => console.error('MongoDB Error:', err));
 
 // =========================
 // Command Loader
