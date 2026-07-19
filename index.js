@@ -179,7 +179,7 @@ client.once('ready', () => {
     const updateStatus = () => {
         client.user.setPresence({
             activities: [statuses[currentStatus]],
-            status: 'idle'
+            status: 'online'
         });
     };
 
