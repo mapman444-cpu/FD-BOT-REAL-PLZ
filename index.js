@@ -14,7 +14,6 @@ require('dotenv').config();
 
 console.log("Loaded Discord.js version:", require('discord.js').version);
 
-
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -23,7 +22,6 @@ const client = new Client({
     ]
 });
 
-
 process.on('unhandledRejection', (reason) => {
     console.error('Unhandled Rejection:', reason);
 });
@@ -32,8 +30,6 @@ process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
 });
 
-
-
 process.on('unhandledRejection', (reason) => {
     console.error('Unhandled Rejection:', reason);
 });
@@ -41,7 +37,6 @@ process.on('unhandledRejection', (reason) => {
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
 });
-
 
 client.on('error', (err) => {
     console.error('Discord client error:', err);
@@ -64,13 +59,9 @@ setInterval(() => {
     console.log("Heartbeat: Bot is alive");
 }, 5 * 60 * 1000); 
 
-
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('📦 Connected to MongoDB'))
     .catch(err => console.error('MongoDB Error:', err));
-
-
-
 
 client.commands = new Collection();
 const commands = [];
@@ -89,7 +80,6 @@ for (const file of commandFiles) {
         console.log(`⚠️ Command at ${filePath} is missing "data" or "execute".`);
     }
 }
-
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
@@ -110,7 +100,6 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
         console.error(error);
     }
 })();
-
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -161,7 +150,6 @@ client.once('ready', () => {
 
     updateStatus();
 });
-
 
 const PORT = process.env.PORT || 3000;
 
